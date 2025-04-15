@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Usage Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            width: 60%;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        td {
+            background-color: #f9f9f9;
+        }
+    </style>
+    <script>
+        function updateNetworkUsage() {
+            fetch('/network_usage')
+                .then(response => response.json())
+                .then(data => {
+                    let tableBody = document.getElementById('network-data');
+                    tableBody.innerHTML = '';
+                    for (let app in data) {
+                        let row = `<tr>
+                            <td>${app}</td>
+                            <td>${(data[app].sent / 1024).toFixed(2)} KB</td>
+                            <td>${(data[app].recv / 1024).toFixed(2)} KB</td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    }
+                });
+        }
+        setInterval(updateNetworkUsage, 3000);
+    </script>
+</head>
+<body onload="updateNetworkUsage()">
+    <div class="container">
+        <h1>Network Usage by Application</h1>
+        <table>
+            <tr>
+                <th>Application</th>
+                <th>Data Sent</th>
+                <th>Data Received</th>
+            </tr>
+            <tbody id="network-data">
+                <tr><td colspan="3">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

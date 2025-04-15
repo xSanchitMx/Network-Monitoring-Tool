@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Monitoring Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 30px 10px;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      animation: fadeInDown 1s ease-out;
+      text-align: center;
+    }
+    .button-grid {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 1000px;
+      animation: fadeInUp 1.2s ease-out;
+      margin-bottom: 20px;
+    }
+    .tab-button {
+      background-color: rgba(0, 122, 255, 0.2);
+      border: 2px solid #00aaff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fff;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .tab-button:hover {
+      background-color: rgba(0, 122, 255, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 3px 10px rgba(0, 170, 255, 0.3);
+    }
+    .tab-content {
+      display: none;
+      width: 100%;
+      max-width: 1200px;
+      height: 800px;
+      margin-top: 10px;
+      border: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <h1>🌐 Network Monitoring Tool</h1>
+  <div class="button-grid">
+    <div class="tab-button" onclick="openTab('tab1')">📊 Stats</div>
+    <div class="tab-button" onclick="openTab('tab2')">📶 Usage</div>
+    <div class="tab-button" onclick="openTab('tab3')">📡 Ping</div>
+    <div class="tab-button" onclick="openTab('tab4')">⚡ Speed</div>
+    <div class="tab-button" onclick="openTab('tab5')">🔍 Discover</div>
+  </div>
+
+  <iframe id="tab1" class="tab-content" src="http://127.0.0.1:5001"></iframe>
+  <iframe id="tab2" class="tab-content" src="http://127.0.0.1:5003"></iframe>
+  <iframe id="tab3" class="tab-content" src="http://127.0.0.1:5002"></iframe>
+  <iframe id="tab4" class="tab-content" src="http://127.0.0.1:5004"></iframe>
+  <iframe id="tab5" class="tab-content" src="http://127.0.0.1:5005"></iframe>
+
+  <script>
+    function openTab(tabId) {
+      const tabs = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+  </script>
+</body>
+</html>

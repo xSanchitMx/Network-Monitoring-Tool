@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Network Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; }
+        h1 { color: #333; }
+        table {
+            width: 50%;
+            margin: auto;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #007BFF;
+            color: white;
+        }
+        canvas {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Live Network Statistics</h1>
+
+    <!-- Table -->
+    <table>
+        <tr>
+            <th>Received (Total)</th>
+            <th>Receiving Speed</th>
+            <th>Sent (Total)</th>
+            <th>Sending Speed</th>
+        </tr>
+        <tr>
+            <td id="received"></td>
+            <td id="receiving"></td>
+            <td id="sent"></td>
+            <td id="sending"></td>
+        </tr>
+    </table>
+
+    <!-- Live Graph -->
+    <canvas id="networkChart"></canvas>
+
+    <script>
+        let ctx = document.getElementById("networkChart").getContext("2d");
+        let networkChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [
+                    { label: "Download Speed (KB/s)", data: [], borderColor: "blue", fill: false },
+                    { label: "Upload Speed (KB/s)", data: [], borderColor: "green", fill: false }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: { 
+                    x: { title: { display: true, text: "Time (seconds)" } }, 
+                    y: { title: { display: true, text: "Speed (KB/s)" }, min: 0 }
+                }
+            }
+        });
+
+        function updateStats() {
+            fetch("/stats")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('received').innerText = data.received;
+                    document.getElementById('receiving').innerText = data.receiving;
+                    document.getElementById('sent').innerText = data.sent;
+                    document.getElementById('sending').innerText = data.sending;
+
+                    let timeLabel = new Date().toLocaleTimeString();
+
+                    if (networkChart.data.labels.length > 20) {
+                        networkChart.data.labels.shift();
+                        networkChart.data.datasets[0].data.shift();
+                        networkChart.data.datasets[1].data.shift();
+                    }
+
+                    networkChart.data.labels.push(timeLabel);
+                    networkChart.data.datasets[0].data.push(data.receiving.split(' ')[0]);
+                    networkChart.data.datasets[1].data.push(data.sending.split(' ')[0]);
+                    networkChart.update();
+                });
+        }
+
+        setInterval(updateStats, 1000);
+    </script>
+</body>
+</html>

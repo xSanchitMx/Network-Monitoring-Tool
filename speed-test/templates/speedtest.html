@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 50%;
+            margin: auto;
+        }
+        h1 { color: #333; }
+        .result { font-size: 18px; margin-top: 10px; }
+        .loading { color: blue; font-weight: bold; }
+        button {
+            background-color:#007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+    </style>
+    <script>
+        function startSpeedTest() {
+            document.getElementById("result").innerHTML = "<p class='loading'>Running speed test... Please wait.</p>";
+
+            fetch('/start_speed_test')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("result").innerHTML = `
+                        <p><strong>Download Speed:</strong> ${data.download}</p>
+                    `;
+                })
+                .catch(error => {
+                    document.getElementById("result").innerHTML = "<p style='color: red;'>Error running speed test.</p>";
+                    console.error("Error:", error);
+                });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Internet Speed Test</h1>
+        <button onclick="startSpeedTest()">Start Speed Test</button>
+        <div id="result" class="result"></div>
+    </div>
+</body>
+</html>

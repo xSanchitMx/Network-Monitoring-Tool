@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Discovery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 20px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+    </style>
+    <script>
+        function scanNetwork() {
+            document.getElementById("status").innerText = "Scanning...";
+            fetch('/scan')
+                .then(response => response.json())
+                .then(data => {
+                    let table = document.getElementById("device-table");
+                    table.innerHTML = "<tr><th>IP Address</th><th>MAC Address</th><th>Hostname</th></tr>";
+                    
+                    data.forEach(device => {
+                        let row = `<tr>
+                            <td>${device.ip}</td>
+                            <td>${device.mac}</td>
+                            <td>${device.hostname}</td>
+                        </tr>`;
+                        table.innerHTML += row;
+                    });
+
+                    document.getElementById("status").innerText = "Scan Complete!";
+                })
+                .catch(() => {
+                    document.getElementById("status").innerText = "Scan Failed!";
+                });
+        }
+    </script>
+</head>
+<body>
+    <h1>Network Discovery Tool</h1>
+    <button onclick="scanNetwork()">Scan Network</button>
+    <p id="status"></p>
+    <table id="device-table">
+        <tr>
+            <th>IP Address</th>
+            <th>MAC Address</th>
+            <th>Hostname</th>
+        </tr>
+    </table>
+</body>
+</html>

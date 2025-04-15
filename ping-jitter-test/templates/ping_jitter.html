@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ping & Jitter Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+        h1 {
+            color: #333;
+        }
+        pre {
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .bar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .bar-fill {
+            height: 20px;
+            line-height: 20px;
+            color: white;
+            text-align: center;
+        }
+    </style>
+    <script>
+        function scoreColor(score) {
+            if (score >= 80) return '#4CAF50';
+            if (score >= 50) return '#FFC107';
+            return '#F44336';
+        }
+
+        function calcScore(ping, jitter) {
+            let pingScore = Math.max(0, 100 - ping);
+            let jitterScore = Math.max(0, 100 - jitter * 2);
+            return Math.min(100, Math.round((pingScore + jitterScore) / 2));
+        }
+
+        function updateBar(id, label, score) {
+            const bar = document.getElementById(id);
+            bar.style.width = score + '%';
+            bar.style.backgroundColor = scoreColor(score);
+            bar.innerText = `${label}: ${score}%`;
+        }
+
+        function updateStats() {
+            fetch('/ping_jitter')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('ping-result').innerText = data.ping_result;
+                    document.getElementById('jitter').innerText = "Jitter: " + data.jitter;
+
+                    const pingMatch = data.ping_result.match(/time=([0-9]+(?:\.[0-9]+)?)ms/g);
+                    const ping = pingMatch ? parseFloat(pingMatch[pingMatch.length - 1].match(/[0-9.]+/)[0]) : 100;
+                    const jitter = parseFloat(data.jitter.replace(' ms', ''));
+
+                    const gamingScore = calcScore(ping, jitter);
+                    const videoScore = calcScore(ping * 1.2, jitter);
+                    const voipScore = calcScore(ping * 1.5, jitter * 1.2);
+                    const generalScore = Math.round((gamingScore + videoScore + voipScore) / 3);
+
+                    updateBar('gaming-bar', 'Gaming', gamingScore);
+                    updateBar('video-bar', 'Video Call', videoScore);
+                    updateBar('voip-bar', 'VoIP', voipScore);
+                    updateBar('general-bar', 'General Usage', generalScore);
+                });
+        }
+
+        function restartTest() {
+            fetch('/restart_test')
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    updateStats();
+                });
+        }
+
+        setInterval(updateStats, 5000);
+    </script>
+</head>
+<body onload="updateStats()">
+    <div class="container">
+        <h1>Ping & Jitter Test</h1>
+        <h2>Ping:</h2>
+        <pre id="ping-result">Loading...</pre>
+        <h2 id="jitter">Jitter: Loading...</h2>
+        <button class="button" onclick="restartTest()">Restart Test</button>
+
+        <h3>Network Quality Scores</h3>
+        <div class="bar"><div id="gaming-bar" class="bar-fill"></div></div>
+        <div class="bar"><div id="video-bar" class="bar-fill"></div></div>
+        <div class="bar"><div id="voip-bar" class="bar-fill"></div></div>
+        <div class="bar"><div id="general-bar" class="bar-fill"></div></div>
+    </div>
+</body>
+</html>
